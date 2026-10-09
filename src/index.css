@@ -166,6 +166,7 @@ button.kpi { font: inherit; cursor: pointer; }
 .row.is-bad { background: var(--bad-bg); box-shadow: inset 4px 0 0 var(--bad); }
 .row.is-warn { background: #FFF9EA; box-shadow: inset 4px 0 0 var(--gold-d); }
 .row.is-off { opacity: .6; }
+.row.destaque { outline: 3px solid var(--gold); outline-offset: -3px; }
 .row .t { flex: 1; min-width: 0; }
 .row .t b { display: block; font-weight: 600; font-size: 16px; line-height: 1.25; }
 .row .t small { display: block; margin-top: 3px; font: 600 11.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
@@ -192,6 +193,9 @@ button.row.is-bad { background: var(--bad-bg); }
 .legend { display: flex; gap: 16px; flex-wrap: wrap; padding: 0 14px 12px; font: 600 11.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
 .legend i { display: inline-block; width: 18px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
 .scroll-x { overflow-x: auto; }
+.curva-info { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin: 6px 4px 0; padding: 10px 12px; background: var(--soft); border-radius: 6px; font-size: 16px; }
+.curva-info .lbl { width: 100%; }
+.curva-info .real b { color: var(--warn); }
 
 /* botões */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 6px; border: 1px solid var(--navy); background: var(--card); color: var(--navy); font-weight: 600; font-size: 15.5px; white-space: nowrap; text-decoration: none; }
@@ -261,6 +265,8 @@ button.row.is-bad { background: var(--bad-bg); }
 .stepper output { width: 46px; text-align: center; font-size: 20px; font-weight: 700; }
 .savebar { position: sticky; bottom: calc(var(--bottom) + 8px + env(safe-area-inset-bottom)); z-index: 5; }
 @media (min-width: 900px) { .savebar { bottom: 12px; } }
+/* Desligado, o botão flutuante fica sólido (transparente, ele embaralha com a lista de baixo). */
+.savebar .btn:disabled { opacity: 1; background: var(--idle-bg); border-color: var(--line); color: var(--muted); }
 table.t { width: 100%; border-collapse: collapse; font-size: 15px; }
 table.t th { font: 600 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); text-align: right; padding: 10px 12px; border-bottom: 1px solid var(--line); background: var(--soft); }
 table.t th:first-child, table.t td:first-child { text-align: left; }
@@ -344,6 +350,18 @@ select.ipt { appearance: none; background-image: linear-gradient(45deg, transpar
 .galeria .foto { width: 100%; height: auto; aspect-ratio: 4/3; font-size: 12px; }
 .galeria figcaption { margin-top: 6px; font-size: 14px; }
 .galeria figcaption small { display: block; font: 600 11px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+
+/* visão geral das obras */
+.vg-obra { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 14px; }
+.vg-obra:hover { background: var(--soft); }
+.vg-topo { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.vg-topo b { display: block; font-size: 18px; font-weight: 700; line-height: 1.25; }
+.vg-topo small { display: block; margin-top: 2px; font: 600 11.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.vg-nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.vg-num { background: var(--soft); border-radius: 6px; padding: 8px 10px; }
+.vg-num .lbl { font-size: 10.5px; display: block; }
+.vg-num b { display: block; font-size: 26px; font-weight: 700; line-height: 1.15; margin-top: 2px; }
+.vg-num small { display: block; font: 600 11px var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
 
 /* aviso flutuante */
 .toast { position: fixed; left: 50%; bottom: calc(var(--bottom) + 20px); transform: translateX(-50%); background: var(--navy); color: #fff; padding: 14px 18px; border-radius: 8px; font-weight: 600; z-index: 70; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 24px rgba(1,21,46,.3); max-width: calc(100vw - 32px); animation: subir .2s ease; }

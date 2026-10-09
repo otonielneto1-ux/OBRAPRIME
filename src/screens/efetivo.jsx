@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import * as dados from '../lib/dados.js'
 import { useApp } from '../lib/AppContext.jsx'
 import { pode } from '../lib/perfis.js'
-import { folhas, situacao } from '../lib/cronograma.js'
+import { folhas, situacao, nomeAtividade } from '../lib/cronograma.js'
 import { validarLinhaEfetivo, totaisEfetivo, copiarLinhas } from '../lib/efetivo.js'
 import { hoje, addDias, fmtCurta, nomeDia, maxData } from '../lib/datas.js'
 import { TIPOS_EFETIVO, TIPOS_FUNCAO } from '../lib/vocabulario.js'
@@ -35,7 +35,7 @@ export default function Efetivo() {
 
   const funcao = new Map(d.funcoes.map((f) => [f.id, f]))
   const ativ = new Map(d.atividades.map((a) => [a.id, a]))
-  const nomeAtiv = (id) => { const a = ativ.get(id); return a ? (a.local && a.servico ? `${a.local} › ${a.servico}` : a.nome) : '' }
+  const nomeAtiv = (id) => nomeAtividade(ativ.get(id))
   const editavel = pode(usuario, 'lancarEfetivo') && (data === h || pode(usuario, 'editarEfetivoAnterior'))
   const ultimoAntes = maxData(d.efetivo.filter((l) => l.data < data).map((l) => l.data))
   const linhasUltimo = d.efetivo.filter((l) => l.data === ultimoAntes)

@@ -7,6 +7,7 @@ import Shell from './Shell.jsx'
 import Painel from '../screens/painel.jsx'
 import Cronograma from '../screens/cronograma.jsx'
 import Importar from '../screens/importar.jsx'
+import Acerto from '../screens/acerto.jsx'
 import Planejamento from '../screens/planejamento.jsx'
 import Efetivo from '../screens/efetivo.jsx'
 import Obras from '../screens/obras.jsx'
@@ -40,6 +41,7 @@ export default function AppEquipe() {
   switch (tela) {
     case 'crono': corpo = <Cronograma goto={goto} params={params} />; break
     case 'importar': corpo = <Importar goto={goto} />; break
+    case 'acerto': corpo = <Acerto goto={goto} />; break
     case 'plan': corpo = <Planejamento goto={goto} params={params} />; break
     case 'efetivo': corpo = <Efetivo goto={goto} />; break
     case 'obras': corpo = <Obras goto={goto} />; break
@@ -51,7 +53,7 @@ export default function AppEquipe() {
   }
   const semSeletor = ['obras', 'usuarios', 'perfil', 'mais'].includes(tela)
   return (
-    <Shell itens={itens} itensCelular={itensCelular} atual={tela === 'importar' ? 'crono' : tela} irPara={goto}
+    <Shell itens={itens} itensCelular={itensCelular} atual={['importar', 'acerto'].includes(tela) ? 'crono' : tela} irPara={goto}
       semSeletor={semSeletor} titulo={TITULOS[tela]}>
       {corpo}
     </Shell>

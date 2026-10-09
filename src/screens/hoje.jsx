@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import * as dados from '../lib/dados.js'
 import { alertaEfetivo } from '../lib/planejamento.js'
+import { nomeAtividade } from '../lib/cronograma.js'
 import { hoje, fmtData, nomeDia, fmtCurta } from '../lib/datas.js'
 import { Card, Tag, TOM, Icon, Vazio, Carregando, ErroBloco, useCarregar, useToast } from '../components/index.jsx'
 import { MotivoSheet } from './planejamento.jsx'
@@ -51,7 +52,7 @@ export default function Hoje({ goto }) {
               <li key={t.id} className={`row ${t.situacao === 'Não feito' ? 'is-bad' : ''}`} style={{ flexDirection: 'column', alignItems: 'stretch', gap: 10 }}>
                 <span className="t">
                   <b style={{ fontSize: 18 }}>{t.descricao}</b>
-                  <small>{t.responsavel}{a ? ` · ${a.local && a.servico ? `${a.local} › ${a.servico}` : a.nome}` : ''}</small>
+                  <small>{t.responsavel}{a ? ` · ${nomeAtividade(a)}` : ''}</small>
                 </span>
                 <div><Tag tom={TOM[t.situacao]}>{t.situacao}{t.motivo_nao_feito ? ` · ${t.motivo_nao_feito}` : ''}</Tag></div>
                 <div className="botoes2">

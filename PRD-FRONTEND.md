@@ -126,8 +126,11 @@ O detalhe do efetivo (MO direta, indireta, terceirizados, funções) fica na tel
 
 **Ações**
 - **Lançar agora** (na faixa): abre a tela Efetivo no dia de hoje.
-- **Clicar numa atividade atrasada:** abre o Cronograma com a gaveta daquela atividade.
-- **Clicar numa restrição:** abre Planejamento > Restrições com ela aberta.
+- **Clicar numa atividade atrasada:** abre a gaveta daquela atividade ali mesmo, no Painel (dá para lançar avanço sem sair; vale também para o Mestre, que não tem o Cronograma no menu).
+- **Clicar numa restrição:** abre Planejamento > Restrições com ela destacada (borda dourada) e rolada até ela.
+- **Tocar (ou passar o mouse) num ponto da curva S:** mostra a semana, o previsto e o realizado.
+
+**Se um dado não carregar:** o cronograma é essencial (sem ele, a tela mostra o erro com "Tentar de novo"). Os outros blocos — semana, efetivo, restrições, avisos — falham sozinhos: só aquele bloco mostra "Não foi possível carregar…" e o resto do Painel continua. Sem conseguir ler o efetivo, a faixa de alerta não aparece.
 - **Clicar numa tarefa de hoje:** abre Planejamento > Semana e dia no dia de hoje.
 
 **Regras por perfil**
@@ -137,6 +140,44 @@ O detalhe do efetivo (MO direta, indireta, terceirizados, funções) fica na tel
 
 **Estado vazio**
 "Esta obra ainda não tem cronograma. Importe o arquivo do MS Project para começar." + botão "Importar cronograma" (Gerente, Coordenador, Engenheiro). Se a pessoa não tem nenhuma obra: "Você ainda não está vinculado a nenhuma obra. Fale com o gerente."
+
+---
+
+## Painel — aba "Todas as obras" (visão geral)
+
+**Quem acessa:** Gerente e Coordenador, quando enxergam mais de uma obra. Os outros perfis não veem as abas.
+**Chega aqui por:** abas no cabeçalho do Painel: "Esta obra" (padrão, abre sempre nela) e "Todas as obras".
+
+**O que aparece**
+Uma linha (cartão) por obra que não está concluída, na ordem do seletor. Em cada uma: nome, tipo e cidade; etiqueta com a diferença em pontos do previsto (ou a situação, se Paralisada); barra de avanço (realizado preenchido, traço dourado no previsto); e cinco números: Avanço (realizado, com previsto embaixo), Atrasadas, Restrições vencidas (com abertas embaixo), Efetivo hoje ("—" e "não lançado" em âmbar se não houve lançamento), Semana (% cumprido até hoje e "X de Y tarefas"). Obra sem cronograma mostra "Sem cronograma importado". Embaixo: "+ N obras concluídas não aparecem aqui".
+
+**Ações**
+- **Tocar numa obra:** troca para ela e abre o Painel dela na aba "Esta obra".
+
+**Estado vazio**
+"Nenhuma obra em andamento"
+
+---
+
+## Tela: Acerto inicial do avanço
+
+**Quem acessa:** Gerente, Coordenador, Engenheiro.
+**Chega aqui por:** botão "Acertar avanço" no Cronograma; aviso no Painel "A obra começou antes do app? N atividades aparecem atrasadas porque ainda não têm avanço lançado" (aparece quando a obra não tem nenhum avanço lançado e há atrasadas).
+
+**O que aparece**
+Texto explicando para que serve. Busca por atividade, etapa ou EAP. "Marcar todas", "Marcadas = 100%", "Marcadas = previsto de hoje", "Limpar", e o contador "N marcadas · M com % novo para gravar". As atividades que já deveriam ter começado (início da linha de base até hoje) e não estão em 100%, agrupadas por etapa (os dois primeiros níveis do cronograma, ex.: "FASE 01 - LOTEAMENTO › BEACH LOUNGE - FASE 01"), cada grupo com "Todas". Cada linha: caixinha, nome, "EAP · base · previsto hoje · lançado", e o campo do novo %. Linha com % novo fica destacada. Botão fixo embaixo: "Gravar acerto de N atividades".
+
+**Campos e informações**
+
+| Campo | Tipo | Obrigatório | Observação |
+|---|---|---|---|
+| Novo % | número 0–100 | não | vazio ou igual ao atual = não grava |
+
+**Ações**
+- **Gravar acerto:** grava um avanço por atividade, com a data de hoje e a observação "Acerto inicial do avanço"; ou todos, ou nenhum. Volta ao Painel com "Acerto gravado em N atividades".
+
+**Estado vazio**
+"Nada para acertar"
 
 ---
 

@@ -12,6 +12,8 @@ const MATRIZ = {
   verObras: [G, C, E],
   editarObra: [G],
   importarCronograma: [G, C, E],
+  acertarAvanco: [G, C, E],
+  verVisaoGeral: [G, C],
   verCronograma: [G, C, E],
   lancarAvanco: [G, C, E, M],
   verPlanejamento: [G, C, E, M],

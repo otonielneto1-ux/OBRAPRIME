@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import * as dados from '../lib/dados.js'
 import { useApp } from '../lib/AppContext.jsx'
 import { pode } from '../lib/perfis.js'
-import { folhas, situacao, pctPrevisto, linhaBalanco, servicosRepetidos, ativa, chaveLocal } from '../lib/cronograma.js'
+import { folhas, situacao, pctPrevisto, linhaBalanco, servicosRepetidos, ativa, chaveLocal, nomeAtividade } from '../lib/cronograma.js'
 import { hoje, inicioSemana, addDias, difDias, fmtCurta, fmtData, minData, maxData } from '../lib/datas.js'
 import { Abas, Card, Tag, TOM, Icon, Vazio, Carregando, ErroBloco, useCarregar } from '../components/index.jsx'
 import { LinhaBalanco, CORES_SERVICO } from '../components/graficos.jsx'
@@ -44,9 +44,14 @@ export default function Cronograma({ goto, params = {} }) {
         <div className="wrap stack">
           <div className="toolbar">
             <span className="info-linha">Revisão {obra.revisao_atual} · importado em {fmtData(obra.importado_em)} · {d.atividades.filter(ativa).length} atividades</span>
-            {pode(usuario, 'importarCronograma') && (
-              <button type="button" className="btn btn-sm" onClick={() => goto('importar')}><Icon nome="upload" /> Importar cronograma</button>
-            )}
+            <span style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {pode(usuario, 'acertarAvanco') && (
+                <button type="button" className="btn btn-sm" onClick={() => goto('acerto')}><Icon nome="avanco" /> Acertar avanço</button>
+              )}
+              {pode(usuario, 'importarCronograma') && (
+                <button type="button" className="btn btn-sm" onClick={() => goto('importar')}><Icon nome="upload" /> Importar cronograma</button>
+              )}
+            </span>
           </div>
           {aba === 'lista' && <Lista d={d} filtroInicial={params.filtro} abrir={(a) => setAberta(a.id)} />}
           {aba === 'lob' && <AbaLinhaBalanco d={d} abrir={(id) => setAberta(id)} />}
@@ -108,7 +113,7 @@ function Lista({ d, filtroInicial, abrir }) {
       <li key={a.id}>
         <button type="button" className={`row ${sit === 'Atrasada' ? 'is-bad' : ''} ${removida ? 'is-off' : ''} ${comCaminho ? '' : `nivel-${Math.min(a.nivel, 4)}`}`} onClick={() => abrir(a)}>
           <span className="t">
-            <b className={removida ? 'riscado' : ''}>{comCaminho && a.local ? `${a.local} › ${a.servico}` : a.nome}</b>
+            <b className={removida ? 'riscado' : ''}>{comCaminho ? nomeAtividade(a) : a.nome}</b>
             <small>EAP {a.eap} · base {fmtCurta(a.inicio_base)}–{fmtCurta(a.termino_base)}{a.inicio_real ? ` · real ${fmtCurta(a.inicio_real)}–${a.termino_real ? fmtCurta(a.termino_real) : ''}` : ''}</small>
             {!removida && <span className="barra"><i style={{ width: `${real}%` }} /><u style={{ left: `calc(${prev}% - 1px)` }} /></span>}
           </span>
@@ -266,7 +271,7 @@ export function ListaAvanco({ dadosProntos, aoSalvar }) {
               <li key={a.id}>
                 <button type="button" className={`row ${sit === 'Atrasada' ? 'is-bad' : ''}`} onClick={() => setAberta(a.id)}>
                   <span className="t">
-                    <b>{a.local && a.servico && local === 'todos' ? `${a.local} › ${a.servico}` : a.nome}</b>
+                    <b>{local === 'todos' ? nomeAtividade(a) : a.nome}</b>
                     <small>Previsto hoje {Math.round(prev)}% · base {fmtCurta(a.inicio_base)}–{fmtCurta(a.termino_base)}</small>
                     <span className="barra"><i style={{ width: `${a.percentual_realizado}%` }} /><u style={{ left: `calc(${prev}% - 1px)` }} /></span>
                   </span>

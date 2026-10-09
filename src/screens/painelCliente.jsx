@@ -1,7 +1,7 @@
 // Painel do cliente: avanço, curva S e fotos. Nada de restrição, planejamento, efetivo ou custo.
 
 import * as dados from '../lib/dados.js'
-import { folhas, avancoObra, curvaS } from '../lib/cronograma.js'
+import { folhas, avancoObra, curvaS, nomeAtividade } from '../lib/cronograma.js'
 import { hoje, fmtData } from '../lib/datas.js'
 import { Card, Tag, Foto, Vazio, Carregando, ErroBloco, useCarregar } from '../components/index.jsx'
 import { CurvaS } from '../components/graficos.jsx'
@@ -19,7 +19,7 @@ export default function PainelCliente() {
 
   const av = avancoObra(fl, h)
   const dif = Math.round(av.realizado - av.previsto)
-  const nome = new Map(d.atividades.map((a) => [a.id, a.local && a.servico ? `${a.local} › ${a.servico}` : a.nome]))
+  const nome = new Map(d.atividades.map((a) => [a.id, nomeAtividade(a)]))
   const fotos = d.avancos.filter((a) => a.foto_url).sort((a, b) => b.data.localeCompare(a.data)).slice(0, 30)
 
   return (

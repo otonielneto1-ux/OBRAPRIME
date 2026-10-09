@@ -245,10 +245,12 @@ export function useDesktop() {
 /**
  * Busca dados ao abrir a tela. `carregar` devolve um objeto com várias buscas
  * da camada de dados: { atividades: listarAtividades(), ... }.
- * Devolve { d, erro, carregando, recarregar }.
+ * Devolve { d, erro, erros, carregando, recarregar }.
+ * Com `parcial: true`, uma busca que falha não derruba a tela: ela vem `null`
+ * em `d` e a mensagem vai em `erros[chave]`, para só aquele bloco avisar.
  */
-export function useCarregar(carregar, deps = []) {
-  const [estado, setEstado] = useState({ d: null, erro: null, carregando: true })
+export function useCarregar(carregar, deps = [], { parcial = false } = {}) {
+  const [estado, setEstado] = useState({ d: null, erro: null, erros: {}, carregando: true })
   const [versao, setVersao] = useState(0)
   useEffect(() => {
     let vivo = true
@@ -257,12 +259,18 @@ export function useCarregar(carregar, deps = []) {
     const chaves = Object.keys(pedidos)
     Promise.all(chaves.map((k) => pedidos[k])).then((respostas) => {
       if (!vivo) return
-      const erro = respostas.find((r) => r.erro)?.erro || null
+      const erros = Object.fromEntries(chaves.map((k, i) => [k, respostas[i].erro]).filter(([, e]) => e))
       const d = Object.fromEntries(chaves.map((k, i) => [k, respostas[i].data]))
-      setEstado({ d: erro ? null : d, erro, carregando: false })
+      const erro = parcial ? null : Object.values(erros)[0] || null
+      setEstado({ d: erro ? null : d, erro, erros, carregando: false })
     })
     return () => { vivo = false }
   }, [versao, ...deps])
   const recarregar = useCallback(() => setVersao((v) => v + 1), [])
   return { ...estado, recarregar }
+}
+
+/** Aviso dentro de um bloco cujo dado não carregou; o resto da tela continua. */
+export function FalhaBloco({ oque }) {
+  return <div className="row"><span className="t" style={{ color: 'var(--bad)' }}>Não foi possível carregar {oque}. Tente atualizar a página.</span></div>
 }

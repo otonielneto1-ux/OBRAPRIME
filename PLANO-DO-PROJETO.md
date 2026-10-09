@@ -60,6 +60,16 @@ O gerente exporta o cronograma do MS Project (formato XML) e importa no sistema,
 - **Vazio:** "Esta obra ainda não tem cronograma. Importe o arquivo do MS Project para começar."
 - **Nasce e morre:** nasce quando a obra é criada; não se apaga
 
+### Visão geral das obras (pedida pelo gerente em 09/10/2026)
+- Aba "Todas as obras" no Painel, só para Gerente e Coordenador; o Painel continua abrindo em "Esta obra".
+- Uma linha por obra em andamento: avanço realizado x previsto, atrasadas, restrições vencidas, efetivo de hoje e % da semana. Tocar abre o Painel da obra.
+- Motivo: o gerente toca duas obras e precisava trocar e comparar de cabeça.
+
+### Acerto inicial do avanço (pedido pelo gerente em 09/10/2026)
+- Para obra que começou antes do app (o Conviver começou em 01/07): sem acerto, a importação deixa tudo em 0% e o Painel nasce com dezenas de falsos atrasos (54 no XML real).
+- Lista as atividades que já deveriam ter começado e não estão em 100%, agrupadas por etapa; marca várias de uma vez (100% ou o previsto de hoje) ou digita o % de cada.
+- Grava como avanço com a observação "Acerto inicial do avanço" e a data do dia. A curva S mostra esse avanço na semana do acerto (o app não sabe em que semana passada ele aconteceu).
+
 ### Obras
 - **Abre em:** lista de cartões
 - **Mostra:** nome, cliente, tipo (loteamento / stand de vendas / outro), cidade, data de início, data de término prevista, % realizado, status
@@ -172,6 +182,8 @@ Confirmado pelo gerente em 09/10/2026: engenheiro só nas obras vinculadas; mest
 | Quais obras enxerga | todas | todas | só as vinculadas | só as vinculadas | só a dele |
 | Criar/editar obra | sim | não | não | não | não |
 | Importar/reimportar cronograma | sim | sim | sim | não | não |
+| Acerto inicial do avanço | sim | sim | sim | não | não |
+| Visão geral de todas as obras | sim | sim | não | não | não |
 | Lançar avanço | sim | sim | sim | sim | não |
 | Criar/remover restrição | sim | sim | sim | não | não |
 | Planejamento semanal (criar tarefas) | sim | sim | sim | não | não |

@@ -253,6 +253,70 @@ export function linhaBalanco(listaFolhas, hoje, { servicos: filtro, minLocais = 
   }
 }
 
+/**
+ * Nome de uma atividade para mostrar em listas, sem ambiguidade:
+ * - nome que já traz o local ("Execução de Subleito - Rua 03") → o próprio nome;
+ * - "local primeiro" (folha "Drenagem" na "Quadra A") → "Quadra A › Drenagem";
+ * - o resto → o próprio nome.
+ */
+export function nomeAtividade(a) {
+  if (!a) return ''
+  if (a.nome?.includes(' - ')) return a.nome
+  if (a.local && a.servico) return `${a.local} › ${a.servico}`
+  return a.nome
+}
+
+// ───────────────────────── Acerto inicial do avanço ─────────────────────────
+
+export const OBS_ACERTO = 'Acerto inicial do avanço'
+
+/**
+ * A etapa de uma atividade: os dois primeiros níveis acima dela
+ * (ex.: 'FASE 01 - LOTEAMENTO › BEACH LOUNGE - FASE 01', ou só 'Quadra A').
+ */
+export function etapaDe(a, porId) {
+  const ancestrais = []
+  let atual = a
+  let guarda = 0
+  while (atual?.parent_id && guarda++ < 20) {
+    const mae = porId.get(atual.parent_id)
+    if (!mae) break
+    ancestrais.unshift(mae.nome)
+    atual = mae
+  }
+  return ancestrais.length ? ancestrais.slice(0, 2).join(' › ') : 'Sem etapa'
+}
+
+/**
+ * Atividades que precisam de acerto quando a obra começou antes do app:
+ * folhas que já deveriam ter começado (início da linha de base até hoje) e não estão em 100%.
+ */
+export function candidatasAcerto(listaFolhas, hoje) {
+  return listaFolhas
+    .filter((a) => a.inicio_base && a.inicio_base <= hoje && Number(a.percentual_realizado || 0) < 100)
+    .sort((x, y) => compararEap(x.eap, y.eap))
+}
+
+/**
+ * Transforma o que foi preenchido na tela ({ id: '80' }) nos lançamentos a gravar.
+ * Ignora campo vazio e % igual ao atual. Recusa % fora de 0–100.
+ * Devolve { itens, erros }.
+ */
+export function planoAcerto(preenchidos, porId) {
+  const itens = []
+  const erros = []
+  for (const [id, valor] of Object.entries(preenchidos)) {
+    if (valor === '' || valor == null) continue
+    const a = porId.get(id)
+    if (!a || a.resumo) continue
+    const pct = Number(valor)
+    if (!Number.isFinite(pct) || pct < 0 || pct > 100) { erros.push(`${a.nome}: o % precisa estar entre 0 e 100.`); continue }
+    if (pct === Number(a.percentual_realizado || 0)) continue
+    itens.push({ atividade_id: id, percentual: pct })
+  }
+  return { itens, erros }
+}
+
 /** Compara '1.2.10' e '1.2.9' como números, não como texto. */
 export function compararEap(x, y) {
   const a = String(x).split('.').map(Number)

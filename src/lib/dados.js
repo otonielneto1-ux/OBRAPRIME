@@ -14,7 +14,8 @@ import {
   mockRestricoes, mockTarefas, mockEfetivos, mockAvisos,
 } from './mockData.js'
 import { pode, obrasVisiveis, ordenarObras } from './perfis.js'
-import { aplicarAvanco, avancoObra, folhas, compararEap } from './cronograma.js'
+import { aplicarAvanco, avancoObra, folhas, compararEap, OBS_ACERTO } from './cronograma.js'
+import { resumoObra } from './resumoObras.js'
 import { validarLinhaEfetivo } from './efetivo.js'
 import { hoje } from './datas.js'
 import { MOTIVOS_NAO_FEITO, SITUACOES_TAREFA, TIPOS_RESTRICAO, TIPOS_OBRA, STATUS_OBRA, PERFIS } from './vocabulario.js'
@@ -232,6 +233,51 @@ export const lancarAvanco = ({ atividade_id, data, percentual, observacao, foto_
   // O que o gatilho do banco vai fazer: atualizar o %, o início e o término reais.
   Object.assign(ativ, aplicarAvanco(db.avancos.filter((a) => a.atividade_id === atividade_id)))
   return { avanco: { ...novo }, atividade: { ...ativ } }
+})
+
+/**
+ * Acerto inicial: grava vários avanços de uma vez, todos com a observação
+ * "Acerto inicial do avanço". Ou todos, ou nenhum.
+ */
+export const acertarAvancoInicial = (itens, data) => resposta(() => {
+  exigir('acertarAvanco')
+  const obra = obraDaVez()
+  if (!itens.length) throw new Error('Nenhuma atividade com % novo para gravar.')
+  for (const it of itens) {
+    const a = db.atividades.find((x) => x.id === it.atividade_id && x.obra_id === obra)
+    if (!a || a.resumo) throw new Error('Atividade não encontrada nesta obra.')
+    if (!(it.percentual >= 0 && it.percentual <= 100)) throw new Error(`${a.nome}: o % precisa estar entre 0 e 100.`)
+  }
+  const agora = agoraIso()
+  for (const it of itens) {
+    db.avancos.push({
+      id: novoId('av'), obra_id: obra, atividade_id: it.atividade_id, data: data || hoje(), percentual: it.percentual,
+      observacao: OBS_ACERTO, foto_url: null, lancado_por: usuario.id, created_at: agora,
+    })
+    const a = db.atividades.find((x) => x.id === it.atividade_id)
+    Object.assign(a, aplicarAvanco(db.avancos.filter((x) => x.atividade_id === it.atividade_id)))
+  }
+  return itens.length
+})
+
+/**
+ * Visão geral: uma linha por obra visível que não está concluída
+ * (no banco, vira uma consulta agregada — nunca um laço chamando obra por obra).
+ */
+export const resumoGeralObras = () => resposta(() => {
+  exigir('verVisaoGeral')
+  const h = hoje()
+  return ordenarObras(obrasVisiveis(usuario, db.obras, db.membros))
+    .filter((o) => o.status !== 'Concluída')
+    .map((o) => ({
+      obra: { ...o },
+      ...resumoObra({
+        atividades: db.atividades.filter((a) => a.obra_id === o.id),
+        restricoes: db.restricoes.filter((r) => r.obra_id === o.id),
+        tarefas: db.tarefas.filter((t) => t.obra_id === o.id),
+        efetivo: db.efetivos.filter((l) => l.obra_id === o.id && l.data === h),
+      }, h),
+    }))
 })
 
 /**

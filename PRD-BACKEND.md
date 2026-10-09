@@ -249,6 +249,11 @@ Para que serve: o quadro de avisos de cada obra.
 
 ---
 
+## Acerto inicial do avanço e visão geral (09/10/2026)
+
+- **Acerto inicial:** não cria coluna nova. Cada acerto é uma linha em `avancos` com `observacao = 'Acerto inicial do avanço'`, gravadas todas numa transação só (ou todas, ou nenhuma). Permissão: Gerente, Coordenador, Engenheiro com acesso à obra.
+- **Visão geral das obras:** uma consulta agregada (view ou função no banco) que devolve uma linha por obra visível e não concluída, com previsto, realizado, atrasadas, restrições abertas e vencidas, efetivo de hoje e % de tarefas cumpridas na semana. Nunca um laço no app chamando o banco obra por obra. Só Gerente e Coordenador.
+
 ## Visão para o cliente
 
 O Cliente **não lê a tabela `avancos` diretamente** (ela tem observação e quem lançou). Ele lê uma visão `avancos_cliente` com só: `obra_id`, `atividade_id`, nome da atividade, `data`, `percentual`, `foto_url`, filtrada pelas obras em que ele está em `membros`. A curva S do cliente é calculada a partir de `atividades` + `avancos_cliente`.

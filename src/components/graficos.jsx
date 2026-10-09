@@ -1,6 +1,7 @@
 // Os dois gráficos da v1: curva S e linha de balanço. SVG feito à mão.
 // Recebem os dados já calculados por src/lib/cronograma.js.
 
+import { useState } from 'react'
 import { difDias, fmtCurta, addDias } from '../lib/datas.js'
 
 const MESES = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ']
@@ -23,6 +24,7 @@ function meses(ini, fim) {
 }
 
 export function CurvaS({ pontos, hoje }) {
+  const [sel, setSel] = useState(null)
   if (!pontos?.length) return null
   const W = 640, H = 250, ml = 42, mr = 14, mt = 22, mb = 34
   const w = W - ml - mr, h = H - mt - mb
@@ -38,7 +40,11 @@ export function CurvaS({ pontos, hoje }) {
   const prevHoje = pontos.find((p) => p.inicio <= hoje && p.fim >= hoje)
   const passo = Math.max(1, Math.ceil(meses(ini, fim).length / 8))
   const xh = x(hoje)
+  // Semana mostrada embaixo do gráfico: a tocada, ou a atual.
+  const idxAtual = pontos.findIndex((q) => q.inicio <= hoje && q.fim >= hoje)
+  const p = pontos[sel ?? (idxAtual >= 0 ? idxAtual : pontos.length - 1)]
   return (
+    <>
     <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Curva S: realizado ${ultimo?.v ?? 0}%`}>
       {[0, 25, 50, 75, 100].map((v) => (
         <g key={v}>
@@ -58,14 +64,36 @@ export function CurvaS({ pontos, hoje }) {
       )}
       <path d={linha(prev)} fill="none" stroke="#01152E" strokeWidth="2.5" />
       {real.length > 0 && <path d={linha(real)} fill="none" stroke="#E49B2C" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />}
-      {pontos.map((p) => (
-        <circle key={p.inicio} cx={x(p.fim)} cy={y(p.realizado ?? p.previsto)} r="9" fill="transparent">
-          <title>{`Semana ${fmtCurta(p.inicio)}–${fmtCurta(p.fim)}: previsto ${p.previsto}%${p.realizado != null ? `, realizado ${p.realizado}%` : ''}`}</title>
-        </circle>
-      ))}
       {ultimo && <circle cx={x(ultimo.fim)} cy={y(ultimo.v)} r="5.5" fill="#E49B2C" stroke="#fff" strokeWidth="2" />}
       {prevHoje && hoje >= ini && <circle cx={xh} cy={y(prevHoje.previsto)} r="4.5" fill="#01152E" stroke="#fff" strokeWidth="2" />}
+      {/* Faixas invisíveis, uma por semana: tocar (celular) ou passar o mouse mostra a semana. */}
+      {pontos.map((p, i) => {
+        const x0 = i === 0 ? ml : (x(pontos[i - 1].fim) + x(p.fim)) / 2
+        const x1 = i === pontos.length - 1 ? W - mr : (x(p.fim) + x(pontos[i + 1].fim)) / 2
+        return (
+          <rect key={p.inicio} x={x0} y={mt} width={Math.max(1, x1 - x0)} height={h} fill="transparent"
+            style={{ cursor: 'pointer' }} onClick={() => setSel(sel === i ? null : i)} onMouseEnter={() => setSel(i)}>
+            <title>{`Semana ${fmtCurta(p.inicio)}–${fmtCurta(p.fim)}`}</title>
+          </rect>
+        )
+      })}
+      {p && (
+        <g pointerEvents="none">
+          <line x1={x(p.fim)} x2={x(p.fim)} y1={mt} y2={mt + h} stroke="#5B6576" strokeWidth="1" />
+          <circle cx={x(p.fim)} cy={y(p.previsto)} r="5" fill="#01152E" stroke="#fff" strokeWidth="2" />
+          {p.realizado != null && <circle cx={x(p.fim)} cy={y(p.realizado)} r="6" fill="#E49B2C" stroke="#fff" strokeWidth="2" />}
+        </g>
+      )}
     </svg>
+    {/* Os números da semana escolhida ficam fora do SVG, em tamanho de texto normal: no celular o gráfico encolhe. */}
+    {p && (
+      <div className="curva-info" aria-live="polite">
+        <span className="lbl">Semana {fmtCurta(p.inicio)}–{fmtCurta(p.fim)}{p.inicio <= hoje && p.fim >= hoje ? ' · atual' : ''}</span>
+        <span><b>Previsto {Math.round(p.previsto)}%</b></span>
+        <span className="real"><b>{p.realizado != null ? `Realizado ${Math.round(p.realizado)}%` : 'Realizado: ainda não'}</b></span>
+      </div>
+    )}
+    </>
   )
 }
 

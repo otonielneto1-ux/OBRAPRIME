@@ -1,10 +1,10 @@
 // Planejamento: 3 meses (12 semanas com restrições), restrições e semana e dia.
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as dados from '../lib/dados.js'
 import { useApp } from '../lib/AppContext.jsx'
 import { pode } from '../lib/perfis.js'
-import { folhas } from '../lib/cronograma.js'
+import { folhas, nomeAtividade } from '../lib/cronograma.js'
 import { janelaSemanas, restricoesAbertasPorAtividade, estadoRestricao, resumoTarefas, historicoSemanas } from '../lib/planejamento.js'
 import { hoje, addDias, inicioSemana, fmtCurta, fmtData, nomeDia } from '../lib/datas.js'
 import { TIPOS_RESTRICAO, MOTIVOS_NAO_FEITO } from '../lib/vocabulario.js'
@@ -26,7 +26,7 @@ export default function Planejamento({ params = {} }) {
       {!erro && d && (
         <div className="wrap stack">
           {aba === '3meses' && <TresMeses d={d} recarregar={recarregar} />}
-          {aba === 'restricoes' && <Restricoes d={d} recarregar={recarregar} />}
+          {aba === 'restricoes' && <Restricoes d={d} recarregar={recarregar} destaque={params.destaque} />}
           {aba === 'semana' && <SemanaDia d={d} recarregar={recarregar} />}
         </div>
       )}
@@ -34,7 +34,6 @@ export default function Planejamento({ params = {} }) {
   )
 }
 
-const nomeAtividade = (a) => (a ? (a.local && a.servico ? `${a.local} › ${a.servico}` : a.nome) : '')
 
 // ───────────────────────── 3 meses ─────────────────────────
 
@@ -112,10 +111,13 @@ function TresMeses({ d, recarregar }) {
 
 // ───────────────────────── Restrições ─────────────────────────
 
-function LinhaRestricao({ r, recarregar, nomeAtiv, onEditar }) {
+function LinhaRestricao({ r, recarregar, nomeAtiv, onEditar, destaque }) {
   const { usuario } = useApp()
   const toast = useToast()
   const [excluir, setExcluir] = useState(false)
+  const ref = useRef(null)
+  // Veio do Painel tocando nesta restrição: rola até ela.
+  useEffect(() => { if (destaque) ref.current?.scrollIntoView({ block: 'center' }) }, [destaque])
   const est = estadoRestricao(r, hoje())
   const cls = est === 'vencida' ? 'is-bad' : est === 'proxima' ? 'is-warn' : est === 'removida' ? 'is-off' : ''
   const tag = est === 'removida' ? ['ok', `Removida ${fmtCurta(r.removida_em)}`]
@@ -128,7 +130,7 @@ function LinhaRestricao({ r, recarregar, nomeAtiv, onEditar }) {
     recarregar()
   }
   return (
-    <li className={`row ${cls}`} style={{ flexWrap: 'wrap' }}>
+    <li ref={ref} className={`row ${cls} ${destaque ? 'destaque' : ''}`} style={{ flexWrap: 'wrap' }}>
       <span className="t" style={{ minWidth: 200 }}>
         <b>{r.descricao}</b>
         <small>{nomeAtiv ? `${nomeAtiv} · ` : ''}{r.tipo} · {r.responsavel}</small>
@@ -150,7 +152,7 @@ function LinhaRestricao({ r, recarregar, nomeAtiv, onEditar }) {
   )
 }
 
-function Restricoes({ d, recarregar }) {
+function Restricoes({ d, recarregar, destaque }) {
   const { usuario } = useApp()
   const h = hoje()
   const [situ, setSitu] = useState('Aberta')
@@ -195,7 +197,7 @@ function Restricoes({ d, recarregar }) {
       <div className="card">
         {lista.length === 0
           ? <Vazio icone="check" titulo={situ === 'Aberta' ? 'Nenhuma restrição aberta. Bom sinal.' : 'Nada por aqui'} texto={situ === 'Aberta' ? 'Quando algo travar uma atividade, registre aqui com responsável e data limite.' : 'Nenhuma restrição neste filtro.'} />
-          : <ul className="list">{lista.map((r) => <LinhaRestricao key={r.id} r={r} recarregar={recarregar} nomeAtiv={nomeAtividade(ativ.get(r.atividade_id))} onEditar={setForm} />)}</ul>}
+          : <ul className="list">{lista.map((r) => <LinhaRestricao key={r.id} r={r} recarregar={recarregar} nomeAtiv={nomeAtividade(ativ.get(r.atividade_id))} onEditar={setForm} destaque={r.id === destaque} />)}</ul>}
       </div>
       {form && <RestricaoForm inicial={form} atividades={folhas(d.atividades)} onFechar={() => setForm(null)} onSalvo={() => { setForm(null); recarregar() }} />}
     </>
