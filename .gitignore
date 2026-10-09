@@ -1,0 +1,11 @@
+node_modules
+dist
+.env.local
+.env
+.vercel
+.DS_Store
+*.log
+
+# Cronogramas reais de cliente (MS Project) não vão para o GitHub
+/*.xml
+/*.mpp
